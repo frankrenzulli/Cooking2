@@ -6,16 +6,39 @@ using UnityEngine.AI;
 
 public class BTConttroller : MonoBehaviour
 {
-    [SerializeField] private Transform VodkaFridge;
-    [SerializeField] private Transform GinFridge;
-    [SerializeField] private Transform LemonSodaFridge;
-    [SerializeField] private Transform TonicFridge;
-    [SerializeField] private Transform LemonSliceFridge;
-    [SerializeField] private Transform Bar;
+    [SerializeField] int vodkaStocked;
+    [SerializeField] int ginStocked;
+    [SerializeField] int lemonsodaStocked;
+    [SerializeField] int tonicStocked;
+    [SerializeField] int lemonSliceStocked;
 
-    [SerializeField] float timeToReload;
-    private float timerToReload;
+    [SerializeField] Transform VodkaFridge;
+    [SerializeField] Transform GinFridge;
+    [SerializeField] Transform LemonSodaFridge;
+    [SerializeField] Transform TonicFridge;
+    [SerializeField] Transform LemonSliceFridge;
+    [SerializeField] Transform Bar;
+
+    [SerializeField]
+    Transform[] ingredientsSpot;
+
+    [SerializeField] GameObject vodkaPrefab;
+    [SerializeField] GameObject ginPrefab;
+    [SerializeField] GameObject lemonsodaPrefab;
+    [SerializeField] GameObject tonicPrefab;
+    [SerializeField] GameObject lemonslicePrefab;
+
+    [SerializeField] float timeToReload = .5f;
+    [SerializeField] float timerToReload;
     [SerializeField] SpawnerClienti spawner;
+
+    [SerializeField] float timeToPutOnBar = .5f;
+    [SerializeField] float timerToPutOnBar;
+
+    private int spotIndex = 0;
+
+    [SerializeField] float timeToMixCocktail = 1;
+    [SerializeField] float timerToMixCocktail;
 
     public enum ActionState { Idle, Working };
     ActionState state = ActionState.Idle;
@@ -32,23 +55,23 @@ public class BTConttroller : MonoBehaviour
 
         tree = new BTRoot();
         Sequence cocktailDone = new Sequence("CocktailFatto");
-        Sequence VodkaReady = new Sequence("Vodka Sul Bancone");
-        Sequence GinReady = new Sequence("Gin Sul Bancone");
-        Sequence LemonSodaReady = new Sequence("Lemon Soda Sul Bancone");
-        Sequence TonicReady = new Sequence("Tonica Sul Bancone");
-        Sequence LemonSliceReady = new Sequence("Limone Sul Bancone");
+        Sequence VodkaReady = new Sequence("Vodka pronta");
+        Sequence GinReady = new Sequence("Gin pronto");
+        Sequence LemonSodaReady = new Sequence("Lemon Soda pronta");
+        Sequence TonicReady = new Sequence("Tonica pronta");
+        Sequence LemonSliceReady = new Sequence("Limone pronto");
 
         Leaf reloadVodka = new Leaf("Vodka ricaricata", ReloadVodka);
-        Leaf reloadGin = new Leaf("Vodka ricaricata", ReloadGin);
-        Leaf reloadLemonSoda = new Leaf("Vodka ricaricata", ReloadLemonSoda);
-        Leaf reloadTonic = new Leaf("Vodka ricaricata", ReloadTonic);
-        Leaf reloadLemonSlice = new Leaf("Vodka ricaricata", ReloadLemonSlice);
+        Leaf reloadGin = new Leaf("Gin ricaricata", ReloadGin);
+        Leaf reloadLemonSoda = new Leaf("LemonSoda ricaricata", ReloadLemonSoda);
+        Leaf reloadTonic = new Leaf("Tonica ricaricata", ReloadTonic);
+        Leaf reloadLemonSlice = new Leaf("Limone ricaricata", ReloadLemonSlice);
 
         Leaf vodkaOnBar = new Leaf("Vodka sul bancone", VodkaOnBar);
-        Leaf ginOnBar = new Leaf("Vodka sul bancone", GinOnBar);
-        Leaf lemonSodaOnBar = new Leaf("Vodka sul bancone", LemonSodaOnBar);
-        Leaf tonicOnBar = new Leaf("Vodka sul bancone", TonicOnBar);
-        Leaf lemonSliceOnBar = new Leaf("Vodka sul bancone", LemonSliceOnBar);
+        Leaf ginOnBar = new Leaf("Gin sul bancone", GinOnBar);
+        Leaf lemonSodaOnBar = new Leaf("LemonSoda sul bancone", LemonSodaOnBar);
+        Leaf tonicOnBar = new Leaf("Tonica sul bancone", TonicOnBar);
+        Leaf lemonSliceOnBar = new Leaf("Limone sul bancone", LemonSliceOnBar);
 
         Leaf doCocktail = new Leaf("Faccio il cocktail", DoCocktail);
 
@@ -63,6 +86,7 @@ public class BTConttroller : MonoBehaviour
         //theft.AddChild(goToItem);
         //theft.AddChild(getToSafety);
         //tree.AddChild(theft);
+
         LemonSliceReady.AddChild(lemonSliceOnBar);
         LemonSliceReady.AddChild(reloadLemonSlice);
 
@@ -70,20 +94,21 @@ public class BTConttroller : MonoBehaviour
         TonicReady.AddChild(reloadTonic);
 
         LemonSodaReady.AddChild(lemonSodaOnBar);
-        LemonSodaReady.AddChild(reloadLemonSoda);   
-        
+        LemonSodaReady.AddChild(reloadLemonSoda);
+
         GinReady.AddChild(ginOnBar);
         GinReady.AddChild(reloadGin);
 
         VodkaReady.AddChild(vodkaOnBar);
         VodkaReady.AddChild(reloadVodka);
 
-        cocktailDone.AddChild(doCocktail);
-        cocktailDone.AddChild(LemonSliceReady);
-        cocktailDone.AddChild(TonicReady);
-        cocktailDone.AddChild(LemonSodaReady);
-        cocktailDone.AddChild(GinReady);
         cocktailDone.AddChild(VodkaReady);
+        cocktailDone.AddChild(GinReady);
+        cocktailDone.AddChild(LemonSodaReady);
+        cocktailDone.AddChild(TonicReady);
+        cocktailDone.AddChild(LemonSliceReady);
+        cocktailDone.AddChild(doCocktail);
+
         tree.AddChild(cocktailDone);
 
         tree.PrintTree();
@@ -161,68 +186,101 @@ public class BTConttroller : MonoBehaviour
     }*/
     BTNode.Status ReloadVodka()
     {
-        return BTNode.Status.Success;
+        return ReloadIngredients(ref vodkaStocked, spawner.enemies[0].GetComponent<Clienti>().requiredVodka, VodkaFridge);
     }
 
     BTNode.Status ReloadGin()
     {
-        return BTNode.Status.Success;
+        return ReloadIngredients(ref ginStocked, spawner.enemies[0].GetComponent<Clienti>().requiredGin, GinFridge);
     }
 
     BTNode.Status ReloadLemonSoda()
     {
-        return BTNode.Status.Success;
+        return ReloadIngredients(ref lemonsodaStocked, spawner.enemies[0].GetComponent<Clienti>().requiredLemonSoda, LemonSodaFridge);
     }
 
     BTNode.Status ReloadTonic()
     {
-        return BTNode.Status.Success;
+        return ReloadIngredients(ref tonicStocked, spawner.enemies[0].GetComponent<Clienti>().requiredTonic, TonicFridge);
     }
 
     BTNode.Status ReloadLemonSlice()
     {
-        return BTNode.Status.Success;
+        return ReloadIngredients(ref lemonSliceStocked, spawner.enemies[0].GetComponent<Clienti>().requiredLemonSlice, LemonSliceFridge);
     }
 
     BTNode.Status VodkaOnBar()
     {
-        return BTNode.Status.Success;
+        Debug.Log("vodka sul banco");
+        return PutIngredientsOnBar(ref vodkaStocked, ref spawner.enemies[0].GetComponent<Clienti>().requiredVodka, vodkaPrefab);
     }
     BTNode.Status GinOnBar()
     {
-        return BTNode.Status.Success;
+        Debug.Log("gin sul banco");
+        return PutIngredientsOnBar(ref ginStocked, ref spawner.enemies[0].GetComponent<Clienti>().requiredGin, ginPrefab);
     }
     BTNode.Status LemonSodaOnBar()
     {
-        return BTNode.Status.Success;
+        Debug.Log("soda sul banco");
+        return PutIngredientsOnBar(ref lemonsodaStocked, ref spawner.enemies[0].GetComponent<Clienti>().requiredLemonSoda, lemonsodaPrefab);
     }
     BTNode.Status TonicOnBar()
     {
-        return BTNode.Status.Success;
+        Debug.Log("tonica sul banco");
+        return PutIngredientsOnBar(ref tonicStocked, ref spawner.enemies[0].GetComponent<Clienti>().requiredTonic, tonicPrefab);
     }
     BTNode.Status LemonSliceOnBar()
     {
-        return BTNode.Status.Success;
+        Debug.Log("limone sul banco");
+        return PutIngredientsOnBar(ref lemonSliceStocked, ref spawner.enemies[0].GetComponent<Clienti>().requiredLemonSlice, lemonslicePrefab);
     }
 
     BTNode.Status DoCocktail()
     {
-        return BTNode.Status.Success;
+        Debug.Log("Do cocktail");
+       // timerToMixCocktail -= Time.deltaTime;
+       // if(timerToMixCocktail <= 0)
+       // {
+            spotIndex = 0;
+            spawner.enemies[0].GetComponent<Clienti>().orderDone = true;
+            //timerToMixCocktail = timeToMixCocktail;
+            return BTNode.Status.Success;
+      //  }
+       // return BTNode.Status.Running;
     }
 
-    BTNode.Status PutIngredientsOnBar()
+    BTNode.Status PutIngredientsOnBar(ref int ingredientsStocked, ref int ingredientsRequired, GameObject prefabToSpawn)
     {
-        agent.SetDestination(Bar.position);
-        if (Vector3.Distance(transform.position, Bar.position) <= 1) 
+        if (ingredientsRequired <= ingredientsStocked)
         {
+            Debug.Log("Debug 1");
+            agent.SetDestination(Bar.position);
+            if (Vector3.Distance(transform.position, Bar.position) <= 2)
+            {
 
+                Debug.Log("Debug 2");
+                timerToPutOnBar -= Time.deltaTime;
+                if (timerToPutOnBar <= 0)
+                {
+                    Debug.Log("Debug 3");
+                    timerToPutOnBar = timeToPutOnBar;
+                    GameObject bottle = Instantiate(prefabToSpawn, ingredientsSpot[spotIndex].position, Quaternion.identity);
+                    ingredientsRequired = 0;
+                    ingredientsStocked -= ingredientsRequired;
+                    //ingredientsRequired = 0;
+                    spotIndex++;
+
+                    return BTNode.Status.Success;
+                }
+            }
+            return BTNode.Status.Running;
         }
-        return BTNode.Status.Running;
+         return BTNode.Status.Success;
     }
 
     BTNode.Status ReloadIngredients(ref int ingredientsStocked, int ingredientsToReload, Transform fridge)
     {
-        if (ingredientsStocked <= ingredientsToReload)
+        if (ingredientsStocked < ingredientsToReload)
         {
             agent.SetDestination(fridge.position);
             if (Vector3.Distance(transform.position, fridge.position) < 1)

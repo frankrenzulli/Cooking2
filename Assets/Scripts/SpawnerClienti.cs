@@ -13,7 +13,7 @@ public class SpawnerClienti : MonoBehaviour
     [SerializeField] private int enemyCount = 1;
     [SerializeField] private bool isSpawning = false;
 
-    [SerializeField] List<GameObject> enemies = new List<GameObject>();
+    public List<GameObject> enemies = new List<GameObject>();
 
     private void Start()
     {
@@ -30,19 +30,19 @@ public class SpawnerClienti : MonoBehaviour
     {
         while (isSpawning)
         {
-            yield return new WaitUntil(() => transform.childCount == 0 && TimeManager.Instance.day);
+            yield return new WaitUntil(() => transform.childCount == 0 && TimeManager.instance.day);
 
             Debug.Log($"Round {round} - Spawning {enemyCount} enemies");
 
             for (int i = 0; i < enemyCount; i++)
             {
                 GameObject enemy = Instantiate(enemyPrefab, transform.position, Quaternion.identity);
-
                 enemies.Add(enemy);
-
                 enemy.transform.parent = transform;
 
+                // Aggiungi la chiamata a CheckEnemiesStatus() dopo l'istanziazione di ogni nemico
                 CheckEnemiesStatus();
+
                 yield return new WaitForSeconds(delayBetweenEnemies);
             }
 
@@ -54,20 +54,21 @@ public class SpawnerClienti : MonoBehaviour
     }
     private void CheckEnemiesStatus()
     {
-
+        // Itera attraverso la lista degli enemies all'indietro
         for (int i = enemies.Count - 1; i >= 0; i--)
         {
             GameObject enemy = enemies[i];
 
-
+            // Ottieni lo script "Clienti" attaccato all'oggetto
             Clienti clientiScript = enemy.GetComponent<Clienti>();
 
             // Verifica la variabile desiderata
             if (clientiScript != null && clientiScript.orderDone)
             {
-
-                enemies.RemoveAt(i);
+                // La variabile è uguale a 0, rimuovi l'oggetto dalla lista e distruggilo
+                enemies.RemoveAt(0);
                 Destroy(enemy);
+                
             }
         }
     }

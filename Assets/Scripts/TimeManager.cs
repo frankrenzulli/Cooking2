@@ -4,17 +4,12 @@ using UnityEngine;
 
 public class TimeManager : MonoBehaviour
 {
-    private static TimeManager _instance;
+    public static TimeManager instance;
 
     public bool day;
 
-    public static TimeManager Instance
+    private void Start()
     {
-        get
-        {
-            if (_instance == null)
-                Debug.Log("Nessun time manager");
-            return _instance;
-        }
+        instance = this;
     }
 }
