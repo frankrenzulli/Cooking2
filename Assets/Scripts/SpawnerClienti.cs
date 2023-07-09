@@ -1,75 +1,50 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.PackageManager;
 using UnityEngine;
 
 public class SpawnerClienti : MonoBehaviour
 {
-    public GameObject enemyPrefab;
-    public float spawnInterval = 5f;
-    public float delayBetweenEnemies = 1f;
-
-    [SerializeField] private int round = 1;
-    [SerializeField] private int enemyCount = 1;
-    [SerializeField] private bool isSpawning = false;
-
-    public List<GameObject> enemies = new List<GameObject>();
+    public GameObject enemyPrefab;  
+    public float spawnInterval = 5f; 
+    private int currentRound = 1; 
+    private int enemiesToSpawn = 1;  
+    public List<GameObject> enemies = new List<GameObject>(); 
 
     private void Start()
     {
-        StartSpawning();
+        StartCoroutine(SpawnEnemies());
     }
 
-    private void StartSpawning()
+    private void Update()
     {
-        isSpawning = true;
-        StartCoroutine(SpawnEnemies());
+        if (enemies.Count > 0 && enemies[0].GetComponent<Clienti>().orderDone)
+        {
+            Destroy(enemies[0]);
+            enemies.RemoveAt(0);
+        }
     }
 
     private IEnumerator SpawnEnemies()
     {
-        while (isSpawning)
+        while (true)
         {
-            yield return new WaitUntil(() => transform.childCount == 0 && TimeManager.instance.day);
 
-            Debug.Log($"Round {round} - Spawning {enemyCount} enemies");
+            yield return new WaitUntil(() => enemies.Count == 0 && TimeManager.instance.day);
 
-            for (int i = 0; i < enemyCount; i++)
-            {
-                GameObject enemy = Instantiate(enemyPrefab, transform.position, Quaternion.identity);
-                enemies.Add(enemy);
-                enemy.transform.parent = transform;
+            
+                for (int i = 0; i < enemiesToSpawn; i++)
+                {
+                    GameObject newEnemy = Instantiate(enemyPrefab, transform.position, Quaternion.identity);
+                    enemies.Add(newEnemy);
+                    yield return new WaitForSeconds(1f);  
+                }
+            
 
-                // Aggiungi la chiamata a CheckEnemiesStatus() dopo l'istanziazione di ogni nemico
-                CheckEnemiesStatus();
 
-                yield return new WaitForSeconds(delayBetweenEnemies);
-            }
-
-            round++;
-            enemyCount++;
+            currentRound++;
+            enemiesToSpawn++;
 
             yield return new WaitForSeconds(spawnInterval);
-        }
-    }
-    private void CheckEnemiesStatus()
-    {
-        // Itera attraverso la lista degli enemies all'indietro
-        for (int i = enemies.Count - 1; i >= 0; i--)
-        {
-            GameObject enemy = enemies[i];
-
-            // Ottieni lo script "Clienti" attaccato all'oggetto
-            Clienti clientiScript = enemy.GetComponent<Clienti>();
-
-            // Verifica la variabile desiderata
-            if (clientiScript != null && clientiScript.orderDone)
-            {
-                // La variabile è uguale a 0, rimuovi l'oggetto dalla lista e distruggilo
-                enemies.RemoveAt(0);
-                Destroy(enemy);
-                
-            }
         }
     }
 }

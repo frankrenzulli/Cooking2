@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   vodka: 0
   lemonSoda: 0
-  gin: 2
-  tonica: 2
-  limeSlice: 0
+  gin: 4
+  tonica: 3
+  limeSlice: 2

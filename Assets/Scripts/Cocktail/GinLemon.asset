@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: GinLemon
   m_EditorClassIdentifier: 
   vodka: 0
-  lemonSoda: 2
-  gin: 2
+  lemonSoda: 3
+  gin: 4
   tonica: 0
-  limeSlice: 1
+  limeSlice: 2

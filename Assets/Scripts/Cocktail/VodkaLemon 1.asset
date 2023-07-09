@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13ff2c00a35f9a242af38cec6a308ca7, type: 3}
   m_Name: VodkaLemon 1
   m_EditorClassIdentifier: 
-  vodka: 2
-  lemonSoda: 2
+  vodka: 4
+  lemonSoda: 3
   gin: 0
   tonica: 0
-  limeSlice: 0
+  limeSlice: 2

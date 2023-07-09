@@ -1545,10 +1545,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 5920384892939013563, guid: 9ea953b2eb8981241b600b62207fe87e, type: 3}
   spawnInterval: 1
-  delayBetweenEnemies: 1
-  round: 1
-  enemyCount: 1
-  isSpawning: 1
   enemies: []
 --- !u!4 &850184805
 Transform:
@@ -2118,7 +2114,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!65 &1011945808
 BoxCollider:
@@ -2215,7 +2211,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!65 &1123411869
 BoxCollider:
@@ -3068,7 +3064,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!65 &1549148339
 BoxCollider:
@@ -3739,7 +3735,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!65 &1840429332
 BoxCollider:
@@ -3836,7 +3832,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!65 &2022921766
 BoxCollider:
@@ -4136,17 +4132,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f701dfe347dec614fb734f38805ca682, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vodkaStocked: 5
-  ginStocked: 5
-  lemonsodaStocked: 5
-  tonicStocked: 5
-  lemonSliceStocked: 5
   VodkaFridge: {fileID: 1549148342}
   GinFridge: {fileID: 1011945811}
   LemonSodaFridge: {fileID: 1123411872}
   TonicFridge: {fileID: 2022921769}
   LemonSliceFridge: {fileID: 1840429335}
   Bar: {fileID: 455446042}
+  vodkaStocked: 5
+  ginStocked: 5
+  lemonsodaStocked: 5
+  tonicStocked: 5
+  lemonSliceStocked: 5
   ingredientsSpot:
   - {fileID: 1326361162}
   - {fileID: 637953623}
@@ -4158,11 +4154,12 @@ MonoBehaviour:
   lemonslicePrefab: {fileID: 7201700467886010732, guid: 3bfd4ae7d7fa15949b84bdc5111ea179, type: 3}
   timeToReload: 0.5
   timerToReload: 0
-  spawner: {fileID: 850184804}
   timeToPutOnBar: 0.5
   timerToPutOnBar: 0
-  timeToMixCocktail: 1
+  timeToMixCocktail: 2
   timerToMixCocktail: 0
+  spawner: {fileID: 850184804}
+  spotIndex: 0
 --- !u!195 &2051967802
 NavMeshAgent:
   m_ObjectHideFlags: 0
