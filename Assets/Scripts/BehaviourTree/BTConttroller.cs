@@ -7,6 +7,8 @@ using UnityEngine.AI;
 
 public class BTConttroller : MonoBehaviour
 {
+    
+
     [Header("Fridge")]
     [SerializeField] Transform VodkaFridge;
     [SerializeField] Transform GinFridge;
@@ -44,7 +46,7 @@ public class BTConttroller : MonoBehaviour
 
     [Header("References")]
     [SerializeField] SpawnerClienti spawner;
-
+    [SerializeField] Animator anim;
 
 
     [SerializeField] private int spotIndex = 0;
@@ -61,6 +63,7 @@ public class BTConttroller : MonoBehaviour
 
     private void Start()
     {
+        anim = GetComponent<Animator>();
         timerToMixCocktail = timeToMixCocktail;
         timerToPutOnBar = timeToPutOnBar;
         timerToReload = timeToReload;
@@ -253,10 +256,13 @@ public class BTConttroller : MonoBehaviour
 
     BTNode.Status DoCocktail()
     {
+        anim.SetBool("isWalking", true);
         spotIndex = 0;
         agent.SetDestination(Bar.position);
         if (Vector3.Distance(transform.position, Bar.position) < 2)
         {
+            anim.SetBool("isWalking", false);
+            anim.SetBool("MakeOrder", true) ;
             Debug.Log("Do cocktail");
             timerToMixCocktail -= Time.deltaTime;
             if (timerToMixCocktail <= 0)
@@ -267,6 +273,7 @@ public class BTConttroller : MonoBehaviour
                 for (int spotIndex = 0; spotIndex < ingredientsSpot.Length; spotIndex++)
                 {
                     Destroy(ingredientsSpot[spotIndex].GetChild(0).gameObject);
+                    anim.SetBool("MakeOrder", false) ;
                 }
                 
 
@@ -314,9 +321,11 @@ public class BTConttroller : MonoBehaviour
     {
         if(ingredientsStocked >= ingredientsRequired && ingredientsRequired != 0)
         {
+            anim.SetBool("isWalking", true);
             agent.SetDestination(Bar.position);
             if (Vector3.Distance(transform.position, Bar.position) < 2)
             {
+                anim.SetBool("isWalking", false);
                 timerToPutOnBar -= Time.deltaTime;
                 if (timerToPutOnBar <= 0)
                 {
@@ -347,9 +356,12 @@ public class BTConttroller : MonoBehaviour
     {
         if (ingredientsStocked < ingredientsToReload)
         {
+            
             agent.SetDestination(fridge.position);
+            anim.SetBool("isWalking", true);
             if (Vector3.Distance(transform.position, fridge.position) < 2)
             {
+                anim.SetBool("isWalking", false);
                 timerToReload -= Time.deltaTime;
                 if(timerToReload <= 0)
                 {

@@ -19,7 +19,7 @@ public class SpawnerClienti : MonoBehaviour
     {
         if (enemies.Count > 0 && enemies[0].GetComponent<Clienti>().orderDone)
         {
-            Destroy(enemies[0]);
+            
             enemies.RemoveAt(0);
         }
     }
