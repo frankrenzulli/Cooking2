@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class SpawnerClienti : MonoBehaviour
 {
@@ -22,6 +23,14 @@ public class SpawnerClienti : MonoBehaviour
             
             enemies.RemoveAt(0);
         }
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            Time.timeScale += 1;
+        }else if(Input.GetKeyDown(KeyCode.L))
+        {
+            Time.timeScale = 1;
+        }
+        enemies[0].GetComponent<NavMeshAgent>().avoidancePriority = 1;
     }
 
     private IEnumerator SpawnEnemies()
