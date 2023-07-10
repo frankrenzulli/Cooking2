@@ -1,16 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class SpawnerClienti : MonoBehaviour
 {
-    public GameObject enemyPrefab;
-    public float spawnInterval = 5f;
+    [Header("Customer(s) to spawn")]
+    [SerializeField] GameObject enemyPrefab;
+    [Header("Timers")]
+    [SerializeField] float spawnInterval = 5f;
+    [SerializeField] float customersSpawnInterval = 1f;
+
+    [Header("List Spawned Customer(s)")]
+    public List<GameObject> enemies = new List<GameObject>();//so che non è necessaria ma ho intenzione di aggiungere più tipi di clienti per l'esame finale
+
+
+    [Header("UI Reference")]
+    [SerializeField] TextMeshProUGUI roundText;
+
     private int currentRound = 1;
     private int enemiesToSpawn = 1;
-    public List<GameObject> enemies = new List<GameObject>();
+
     private bool isSpawning = false;
+
 
     private void Start()
     {
@@ -23,19 +36,12 @@ public class SpawnerClienti : MonoBehaviour
         {
             enemies.RemoveAt(0);
         }
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            Time.timeScale += 1;
-        }
-        else if (Input.GetKeyDown(KeyCode.L))
-        {
-            Time.timeScale = 1;
-        }
 
         if (enemies.Count > 0)
         {
             enemies[0].GetComponent<NavMeshAgent>().avoidancePriority = 1;
         }
+        roundText.text = "Round : " + currentRound;
     }
 
     private IEnumerator SpawnEnemies()
@@ -52,7 +58,7 @@ public class SpawnerClienti : MonoBehaviour
             {
                 GameObject newEnemy = Instantiate(enemyPrefab, transform.position, Quaternion.identity);
                 enemies.Add(newEnemy);
-                yield return new WaitForSeconds(1f);
+                yield return new WaitForSeconds(customersSpawnInterval);
             }
 
             currentRound++;

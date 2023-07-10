@@ -7,29 +7,33 @@ using UnityEngine.UI;
 
 public class Clienti : MonoBehaviour
 {
+    [Header("Spots")]
     [SerializeField] Transform exit;
 
+    [Header("Sprites")]
+
+    [SerializeField] Image Face;
+    [SerializeField] Image firstIngredientSprite;
+    [SerializeField] Image secondIngredientSprite;
+    [SerializeField] Sprite DrunkFace;
+
+    [Header("UI References")]
     [SerializeField] TextMeshProUGUI firstIngredientText;
     [SerializeField] TextMeshProUGUI secondIngredientText;
     [SerializeField] TextMeshProUGUI thirdIngredientText;
-
     [SerializeField] TextMeshProUGUI cocktailName;
 
-    [SerializeField] Image Face;
-
-    [SerializeField] Image firstIngredientSprite;
-    [SerializeField] Image secondIngredientSprite;
-
-    [SerializeField] Sprite DrunkFace;
 
     public bool orderDone;
-    [SerializeField] private ScriptableObjects[] cocktailPrefabs;
+
     [SerializeField] int cocktailIndex;
-
+    [Header("References")]
     Transform Bar;
-
     NavMeshAgent agent;
+    [SerializeField] private ScriptableObjects[] cocktailPrefabs;
 
+
+    [Header("Required ingredients")]
     public int requiredVodka;
     public int requiredGin;
     public int requiredLemonSoda;

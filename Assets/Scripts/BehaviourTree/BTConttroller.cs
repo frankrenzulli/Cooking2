@@ -1,14 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class BTConttroller : MonoBehaviour
 {
-    
-
     [Header("Fridge")]
     [SerializeField] Transform VodkaFridge;
     [SerializeField] Transform GinFridge;
@@ -51,7 +50,11 @@ public class BTConttroller : MonoBehaviour
     [SerializeField] Transform bed;
     [SerializeField] private int spotIndex = 0;
 
-
+    [SerializeField] TextMeshProUGUI currentVodka;
+    [SerializeField] TextMeshProUGUI currentGin;
+    [SerializeField] TextMeshProUGUI currentLemonSoda;
+    [SerializeField] TextMeshProUGUI currentTonic;
+    [SerializeField] TextMeshProUGUI currentLemonSlice;
 
     public enum ActionState { Idle, Working };
     ActionState state = ActionState.Idle;
@@ -93,22 +96,8 @@ public class BTConttroller : MonoBehaviour
 
         Leaf dayNight = new Leaf("Giorno/Notte", DayNight);
 
-        //Leaf goToItem = new Leaf("Raggiungi l'Item", GoToItem);
-        //Leaf getToSafety = new Leaf("Scappa dall'edificio", GetToSafety);
-        //Selector openDoor = new Selector("Open Door");
-
-        //openDoor.AddChild(goToFrontDoor);
-        //openDoor.AddChild(goToBackDoor);
-
-        //theft.AddChild(openDoor);
-        //theft.AddChild(goToItem);
-        //theft.AddChild(getToSafety);
-        //tree.AddChild(theft);
-
-
         LemonSliceReady.AddChild(reloadLemonSlice);
         LemonSliceReady.AddChild(lemonSliceOnBar);
-
 
         TonicReady.AddChild(reloadTonic);
         TonicReady.AddChild(tonicOnBar);
@@ -122,7 +111,6 @@ public class BTConttroller : MonoBehaviour
         VodkaReady.AddChild(reloadVodka);
         VodkaReady.AddChild(vodkaOnBar);
 
-
         cocktailDone.AddChild(VodkaReady);
         cocktailDone.AddChild(GinReady);
         cocktailDone.AddChild(LemonSodaReady);
@@ -134,78 +122,18 @@ public class BTConttroller : MonoBehaviour
         tree.AddChild(cocktailDone);
 
         tree.PrintTree();
-        //tree.PrintTree();
-
     }
 
     private void Update()
     {
         
             treeStatus = tree.Process();
+        currentVodka.text = vodkaStocked + "x";
+        currentGin.text = ginStocked + "x";
+        currentLemonSoda.text = lemonsodaStocked + "x";
+        currentTonic.text = tonicStocked + "x";
+        currentLemonSlice.text = lemonSliceStocked + "x";
     }
-
-    /*public BTNode.Status GoToDoor(Transform door)
-    {
-        BTNode.Status s = GoToLocation(door.position);
-
-        if (s == BTNode.Status.Success)
-        {
-            if (!door.GetComponent<Lock>().isLocked)
-            {
-                door.gameObject.SetActive(false);
-                return BTNode.Status.Success;
-            }
-            return BTNode.Status.Failure;
-        }
-
-        return s;
-    }
-
-    public BTNode.Status GoToFrontDoor()
-    {
-        return GoToDoor(frontDoor);
-    }
-
-    public BTNode.Status GoToBackDoor()
-    {
-        return GoToDoor(backDoor);
-    }
-
-    public BTNode.Status GoToItem()
-    {
-        return GoToLocation(treasure.position);
-    }
-
-    public BTNode.Status GetToSafety()
-    {
-        return GoToLocation(safeZone.position);
-    }
-
-    
-
-    BTNode.Status GoToLocation(Vector3 destination)
-    {
-        float distanceToTarget = Vector3.Distance(destination, transform.position);
-
-        if (state == ActionState.Idle)
-        {
-            agent.SetDestination(destination);
-            state = ActionState.Working;
-        }
-        else if (Vector3.Distance(agent.pathEndPosition, destination) >= 2)
-        {
-            state = ActionState.Idle;
-            Debug.Log("Destinazione non raggiungibile");
-            return BTNode.Status.Failure;
-        }
-        else if (distanceToTarget < 2)
-        {
-            state = ActionState.Idle;
-            return BTNode.Status.Success;
-        }
-
-        return BTNode.Status.Running;
-    }*/
     BTNode.Status ReloadVodka()
     {
         return ReloadIngredients(ref vodkaStocked, spawner.enemies[0].GetComponent<Clienti>().requiredVodka, VodkaFridge);
@@ -260,9 +188,15 @@ public class BTConttroller : MonoBehaviour
     {
         if (!TimeManager.instance.day && spawner.enemies.Count == 0)
         {
+            transform.GetComponent<NavMeshAgent>().speed = 8;
+            //transform.GetComponent<NavMeshAgent>().acceleration = 400;
+            anim.SetBool("isWalking", true);
             agent.SetDestination(bed.position);
-            if (Vector3.Distance(transform.position, bed.position) < 2)
+            if (Vector3.Distance(transform.position, bed.position) < 1f)
             {
+                transform.rotation = bed.rotation;
+                anim.SetBool("isWalking", false);
+                anim.SetBool("isSleeping", true);
                 return BTNode.Status.Running;
             }
             return BTNode.Status.Running;
@@ -275,11 +209,15 @@ public class BTConttroller : MonoBehaviour
 
     BTNode.Status DoCocktail()
     {
+        transform.GetComponent<NavMeshAgent>().speed = 4;
+        //transform.GetComponent<NavMeshAgent>().acceleration = 8;
+        anim.SetBool("isSleeping", false);
         anim.SetBool("isWalking", true);
         spotIndex = 0;
         agent.SetDestination(Bar.position);
         if (Vector3.Distance(transform.position, Bar.position) < 2)
         {
+            transform.LookAt(Bar.position);
             anim.SetBool("isWalking", false);
             anim.SetBool("MakeOrder", true) ;
             Debug.Log("Do cocktail");
@@ -302,48 +240,21 @@ public class BTConttroller : MonoBehaviour
         }else return BTNode.Status.Running;
     }
 
-    /*BTNode.Status PutIngredientsOnBar(ref int ingredientsStocked, ref int ingredientsRequired, GameObject prefabToSpawn)
-    {
-        if (ingredientsRequired <= ingredientsStocked)
-        {
-            Debug.Log("Debug 1");
-            agent.SetDestination(Bar.position);
-            if (Vector3.Distance(transform.position, Bar.position) <= 2)
-            {
-
-                Debug.Log("Debug 2");
-                timerToPutOnBar -= Time.deltaTime;
-                if (timerToPutOnBar <= 0)
-                {
-                    Debug.Log("Debug 3");
-                    timerToPutOnBar = timeToPutOnBar;
-                    GameObject bottle = Instantiate(prefabToSpawn, ingredientsSpot[spotIndex].position, Quaternion.identity);
-                    ingredientsRequired = 0;
-                    ingredientsStocked -= ingredientsRequired;
-                    //ingredientsRequired = 0;
-                    if (spotIndex >= ingredientsSpot.Length)
-                    {
-                        spotIndex = 0;
-                    }
-                    else spotIndex++;
-                    
-
-                    return BTNode.Status.Success;
-                }
-            }
-            return BTNode.Status.Running;
-        }
-         return BTNode.Status.Success;
-    }*/
-
     BTNode.Status PutIngredientsOnBar(ref int ingredientsStocked, ref int ingredientsRequired, GameObject prefabToSpawn)
     {
-        if(ingredientsStocked >= ingredientsRequired && ingredientsRequired != 0)
+        transform.GetComponent<NavMeshAgent>().speed = 4;
+        //transform.GetComponent<NavMeshAgent>().acceleration = 8;
+        anim.SetBool("isSleeping", false);
+        if (ingredientsStocked >= ingredientsRequired && ingredientsRequired != 0)
+
         {
             anim.SetBool("isWalking", true);
+
             agent.SetDestination(Bar.position);
+
             if (Vector3.Distance(transform.position, Bar.position) < 2)
             {
+                transform.LookAt(Bar.position);
                 anim.SetBool("isWalking", false);
                 timerToPutOnBar -= Time.deltaTime;
                 if (timerToPutOnBar <= 0)
@@ -373,13 +284,17 @@ public class BTConttroller : MonoBehaviour
 
     BTNode.Status ReloadIngredients(ref int ingredientsStocked, int ingredientsToReload, Transform fridge)
     {
+        transform.GetComponent<NavMeshAgent>().speed = 4;
+        //transform.GetComponent<NavMeshAgent>().acceleration = 8;
         if (ingredientsStocked < ingredientsToReload)
         {
-            
+            anim.SetBool("isSleeping", false);
             agent.SetDestination(fridge.position);
+
             anim.SetBool("isWalking", true);
             if (Vector3.Distance(transform.position, fridge.position) < 2)
             {
+                transform.LookAt(fridge.position);
                 anim.SetBool("isWalking", false);
                 timerToReload -= Time.deltaTime;
                 if(timerToReload <= 0)
