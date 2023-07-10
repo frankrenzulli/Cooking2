@@ -5,11 +5,12 @@ using UnityEngine.AI;
 
 public class SpawnerClienti : MonoBehaviour
 {
-    public GameObject enemyPrefab;  
-    public float spawnInterval = 5f; 
-    private int currentRound = 1; 
-    private int enemiesToSpawn = 1;  
-    public List<GameObject> enemies = new List<GameObject>(); 
+    public GameObject enemyPrefab;
+    public float spawnInterval = 5f;
+    private int currentRound = 1;
+    private int enemiesToSpawn = 1;
+    public List<GameObject> enemies = new List<GameObject>();
+    private bool isSpawning = false;
 
     private void Start()
     {
@@ -20,38 +21,44 @@ public class SpawnerClienti : MonoBehaviour
     {
         if (enemies.Count > 0 && enemies[0].GetComponent<Clienti>().orderDone)
         {
-            
             enemies.RemoveAt(0);
         }
         if (Input.GetKeyDown(KeyCode.P))
         {
             Time.timeScale += 1;
-        }else if(Input.GetKeyDown(KeyCode.L))
+        }
+        else if (Input.GetKeyDown(KeyCode.L))
         {
             Time.timeScale = 1;
         }
-        enemies[0].GetComponent<NavMeshAgent>().avoidancePriority = 1;
+
+        if (enemies.Count > 0)
+        {
+            enemies[0].GetComponent<NavMeshAgent>().avoidancePriority = 1;
+        }
     }
 
     private IEnumerator SpawnEnemies()
     {
         while (true)
         {
+            yield return new WaitUntil(() => TimeManager.instance.day && enemies.Count == 0);
 
-            yield return new WaitUntil(() => enemies.Count == 0 && TimeManager.instance.day);
+            isSpawning = true;
 
-            
-                for (int i = 0; i < enemiesToSpawn; i++)
-                {
-                    GameObject newEnemy = Instantiate(enemyPrefab, transform.position, Quaternion.identity);
-                    enemies.Add(newEnemy);
-                    yield return new WaitForSeconds(1f);  
-                }
-            
+            //yield return new WaitUntil(() => enemies.Count == 0);
 
+            for (int i = 0; i < enemiesToSpawn; i++)
+            {
+                GameObject newEnemy = Instantiate(enemyPrefab, transform.position, Quaternion.identity);
+                enemies.Add(newEnemy);
+                yield return new WaitForSeconds(1f);
+            }
 
             currentRound++;
-            enemiesToSpawn++;
+            //enemiesToSpawn++;
+
+            isSpawning = false;
 
             yield return new WaitForSeconds(spawnInterval);
         }

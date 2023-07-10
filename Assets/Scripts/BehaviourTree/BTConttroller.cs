@@ -48,7 +48,7 @@ public class BTConttroller : MonoBehaviour
     [SerializeField] SpawnerClienti spawner;
     [SerializeField] Animator anim;
 
-
+    [SerializeField] Transform bed;
     [SerializeField] private int spotIndex = 0;
 
 
@@ -91,6 +91,8 @@ public class BTConttroller : MonoBehaviour
 
         Leaf doCocktail = new Leaf("Faccio il cocktail", DoCocktail);
 
+        Leaf dayNight = new Leaf("Giorno/Notte", DayNight);
+
         //Leaf goToItem = new Leaf("Raggiungi l'Item", GoToItem);
         //Leaf getToSafety = new Leaf("Scappa dall'edificio", GetToSafety);
         //Selector openDoor = new Selector("Open Door");
@@ -127,6 +129,7 @@ public class BTConttroller : MonoBehaviour
         cocktailDone.AddChild(TonicReady);
         cocktailDone.AddChild(LemonSliceReady);
         cocktailDone.AddChild(doCocktail);
+        cocktailDone.AddChild(dayNight);
 
         tree.AddChild(cocktailDone);
 
@@ -252,6 +255,22 @@ public class BTConttroller : MonoBehaviour
     {
         Debug.Log("limone sul banco");
         return PutIngredientsOnBar(ref lemonSliceStocked, ref spawner.enemies[0].GetComponent<Clienti>().requiredLemonSlice, lemonslicePrefab);
+    }
+    BTNode.Status DayNight()
+    {
+        if (!TimeManager.instance.day && spawner.enemies.Count == 0)
+        {
+            agent.SetDestination(bed.position);
+            if (Vector3.Distance(transform.position, bed.position) < 2)
+            {
+                return BTNode.Status.Running;
+            }
+            return BTNode.Status.Running;
+        }
+        else
+        {
+            return BTNode.Status.Success;
+        }
     }
 
     BTNode.Status DoCocktail()

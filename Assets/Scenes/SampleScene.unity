@@ -334,6 +334,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   day: 1
+  directionalLight: {fileID: 705507994}
+  dayDuration: 30
+  nightDuration: 10
+  dayRotation: {x: -0.4082181, y: 0.23456977, z: -0.10938175, w: -0.875426}
+  nightRotation: {x: -0.9622502, y: 0.02255759, z: -0.25783426, w: -0.08418604}
+  timer: 0
 --- !u!4 &178791644
 Transform:
   m_ObjectHideFlags: 0
@@ -2360,6 +2366,37 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 28
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1030670386
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1030670387}
+  m_Layer: 0
+  m_Name: Bed
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1030670387
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1030670386}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -15.39, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 43
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1123411868
 GameObject:
   m_ObjectHideFlags: 0
@@ -2774,8 +2811,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1258212319}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9.2435, y: -0.15, z: 1.6613}
-  m_LocalScale: {x: 1.1514, y: 1, z: 3.6368442}
+  m_LocalPosition: {x: -10.649, y: -0.15, z: 1.6613}
+  m_LocalScale: {x: 1.4324567, y: 1, z: 3.6368442}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -4553,6 +4590,7 @@ MonoBehaviour:
   timerToMixCocktail: 0
   spawner: {fileID: 850184804}
   anim: {fileID: 0}
+  bed: {fileID: 1030670387}
   spotIndex: 0
 --- !u!195 &2051967802
 NavMeshAgent:
